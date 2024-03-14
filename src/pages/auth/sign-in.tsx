@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -14,13 +15,23 @@ export function SignIn() {
     const {
         register,
         handleSubmit,
-        formState: { isSubmitting }
+        formState: { isSubmitting, isValid }
     } = useForm<SignInForm>();
 
     async function handleSignIn(data: SignInForm) {
-        console.log(data);
+        console.log(data, 'isValid');
 
         await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        toast.success(
+            'Enviamos um link de autenticação para verificar sua conta!',
+            {
+                action: {
+                    label: 'Reenviar',
+                    onClick: () => {}
+                }
+            }
+        );
     }
     return (
         <>
