@@ -2,7 +2,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Helmet } from 'react-helmet-async';
+
 import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
@@ -15,11 +17,11 @@ export function SignIn() {
     const {
         register,
         handleSubmit,
-        formState: { isSubmitting, isValid }
+        formState: { isSubmitting, errors }
     } = useForm<SignInForm>();
 
     async function handleSignIn(data: SignInForm) {
-        console.log(data, 'isValid');
+        console.log(data, 'errors', errors);
 
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
@@ -37,7 +39,14 @@ export function SignIn() {
         <>
             <Helmet title="Sign In" />
             <div className="p-8">
-                <div className="w-[358px] flex flex-col justify-center gap-6 ">
+                <Button
+                    variant="ghost"
+                    asChild
+                    className="absolute right-8 top-8"
+                >
+                    <Link to="/sign-up">Novo estabelecimento</Link>
+                </Button>
+                <div className="flex w-[358px] flex-col justify-center gap-6 ">
                     <div className="flex flex-col gap-2 text-center">
                         <h1 className="text-2xl font-semibold tracking-tight">
                             Acessar painel
