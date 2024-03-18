@@ -8,10 +8,10 @@ import { twMerge } from 'tailwind-merge';
  */
 export function AuthLayout() {
     return (
-        <div className="min-h-screen grid grid-cols-2">
+        <div className="grid min-h-screen grid-cols-2 antialiased">
             <div
                 className={twMerge(
-                    'flex flex-col justify-between h-full border-d border-foreground/5 ',
+                    'border-d flex h-full flex-col justify-between border-foreground/5 ',
                     'bg-muted p-10 text-muted-foreground'
                 )}
             >
@@ -24,7 +24,7 @@ export function AuthLayout() {
                 </footer>
             </div>
 
-            <div className="flex flex-col justify-center items-center relative">
+            <div className="relative flex flex-col items-center justify-center">
                 <Outlet />
             </div>
         </div>
