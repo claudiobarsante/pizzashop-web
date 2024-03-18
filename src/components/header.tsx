@@ -1,6 +1,7 @@
 import { Home, Pizza, UtensilsCrossed } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { Link } from 'react-router-dom';
+
+import NavLink from './nav-link';
 
 export function Header() {
     return (
@@ -9,14 +10,14 @@ export function Header() {
                 <Pizza className="size-6" />
                 <Separator orientation="vertical" className="h-6" />
                 <nav className="flex items-center space-x-4 lg:space-x-6">
-                    <Link to="/">
+                    <NavLink to="/">
                         <Home className="size-4" />
                         Início
-                    </Link>
-                    <Link to="/orders">
+                    </NavLink>
+                    <NavLink to="/orders">
                         <UtensilsCrossed className="size-4" />
                         Pediddos
-                    </Link>
+                    </NavLink>
                 </nav>
             </div>
         </div>
