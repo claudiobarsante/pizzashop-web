@@ -1,6 +1,8 @@
+import { restaurantRegistration } from '@/api/restaurant-registration';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useMutation } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
@@ -24,20 +26,29 @@ export function SignUp() {
 
     const navigate = useNavigate();
 
+    const { mutateAsync: registerRestaurant } = useMutation({
+        mutationFn: restaurantRegistration
+    });
+
     async function handleSignUp(data: SignUpForm) {
         try {
-            console.log(data);
+            await registerRestaurant({
+                restaurantName: data.restaurantName,
+                managerName: data.managerName,
+                email: data.email,
+                phone: data.phone
+            });
 
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-
-            toast.success('Restaurante cadastrado com sucesso!', {
+            toast.success(`${data.restaurantName} successfully registered!`, {
                 action: {
                     label: 'Login',
-                    onClick: () => navigate('/sign-in')
+                    onClick: () => navigate(`/sign-in?email=${data.email}`)
                 }
             });
         } catch (error) {
-            toast.error('Erro ao cadastrar restaurante.');
+            toast.error(
+                'Error registering restaurant! Please try again later.'
+            );
         }
     }
     return (
