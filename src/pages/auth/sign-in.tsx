@@ -1,6 +1,8 @@
+import { signIn } from '@/api/sign-in';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useMutation } from '@tanstack/react-query';
 import { Helmet } from 'react-helmet-async';
 
 import { useForm } from 'react-hook-form';
@@ -20,10 +22,14 @@ export function SignIn() {
         formState: { isSubmitting, errors }
     } = useForm<SignInForm>();
 
+    const { mutateAsync: authenticate } = useMutation({
+        mutationFn: signIn
+    });
+
     async function handleSignIn(data: SignInForm) {
         console.log(data, 'errors', errors);
 
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        await authenticate({ email: data.email });
 
         toast.success(
             'Enviamos um link de autenticação para verificar sua conta!',
