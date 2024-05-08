@@ -18,13 +18,15 @@ import { StoreProfileDialog } from './store-profile-dialog';
 export function AccountMenu() {
     const { data: profile, isLoading: isLoadingProfile } = useQuery({
         queryKey: ['profile'],
-        queryFn: getProfile
+        queryFn: getProfile,
+        staleTime: Infinity
     });
 
     const { data: managedRestaurant, isLoading: isLoadingManagedRestaurant } =
         useQuery({
             queryKey: ['managed-restaurant'],
-            queryFn: getManagedRestaurant
+            queryFn: getManagedRestaurant,
+            staleTime: Infinity //-- not to refetch when the window loads
         });
 
     return (
