@@ -24,7 +24,7 @@ import { updateProfile } from '@/api/update-profile';
 
 const storeProfileSchema = z.object({
     name: z.string().min(1),
-    description: z.string()
+    description: z.string().nullable()
 });
 
 type StoreProfileSchema = z.infer<typeof storeProfileSchema>;
@@ -37,22 +37,42 @@ export function StoreProfileDialog() {
         staleTime: Infinity
     });
 
+    // -- Optimistic update --
+    //*as soon as the user clicks on the button to save, the cache is updated using onMutate
+    //*if an error occurs roolback to the previous cache
     const { mutateAsync: updateProfileFn } = useMutation({
         mutationFn: updateProfile,
-        onSuccess(_, { description, name }) {
-            const cached =
+        onMutate: async ({ description, name }) => {
+            // Snapshot the previous value
+            // give us the currently stored data
+            const previousCache =
                 queryClient.getQueryData<GetManagedRestaurantResponse>([
                     'managed-restaurant'
                 ]);
-
-            if (cached) {
+            // Cancel any outgoing refetches
+            // (so they don't overwrite our optimistic update)
+            await queryClient.cancelQueries({
+                queryKey: ['managed-restaurant']
+            }); //-- cancel on going querys to not clash with the results of the updated cache
+            // Optimistically update to the new value
+            queryClient.setQueryData<GetManagedRestaurantResponse>(
+                ['managed-restaurant'],
+                {
+                    ...previousCache!,
+                    name,
+                    description
+                }
+            );
+            // Return a context object with the snapshotted value
+            return { previousProfile: previousCache };
+        },
+        // If the mutation fails,
+        // use the context returned from onMutate to roll back
+        onError(_, __, context) {
+            if (context?.previousProfile) {
                 queryClient.setQueryData<GetManagedRestaurantResponse>(
                     ['managed-restaurant'],
-                    {
-                        ...cached,
-                        name,
-                        description
-                    }
+                    context.previousProfile
                 );
             }
         }
