@@ -20,7 +20,7 @@ import {
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
-import { updateProfile } from '@/api/update-profile';
+import { UpdateProfileBody, updateProfile } from '@/api/update-profile';
 
 const storeProfileSchema = z.object({
     name: z.string().min(1),
@@ -42,7 +42,7 @@ export function StoreProfileDialog() {
     //*if an error occurs roolback to the previous cache
     const { mutateAsync: updateProfileFn } = useMutation({
         mutationFn: updateProfile,
-        onMutate: async ({ description, name }) => {
+        onMutate: async (newProfile: UpdateProfileBody) => {
             // Snapshot the previous value
             // give us the currently stored data
             const previousCache =
@@ -55,14 +55,12 @@ export function StoreProfileDialog() {
                 queryKey: ['managed-restaurant']
             }); //-- cancel on going querys to not clash with the results of the updated cache
             // Optimistically update to the new value
-            queryClient.setQueryData<GetManagedRestaurantResponse>(
-                ['managed-restaurant'],
-                {
-                    ...previousCache!,
-                    name,
-                    description
-                }
-            );
+            if (previousCache) {
+                queryClient.setQueryData<GetManagedRestaurantResponse>(
+                    ['managed-restaurant'],
+                    { ...previousCache, ...newProfile }
+                );
+            }
             // Return a context object with the snapshotted value
             return { previousProfile: previousCache };
         },
@@ -75,6 +73,11 @@ export function StoreProfileDialog() {
                     context.previousProfile
                 );
             }
+        },
+        // Always refetch after error or success:
+        // You make sure you fetch the latest data from the server
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ['managed-restaurant'] });
         }
     });
 
