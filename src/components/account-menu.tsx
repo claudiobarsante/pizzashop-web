@@ -7,15 +7,19 @@ import {
     DropdownMenuItem
 } from './ui/dropdown-menu';
 import { Button } from './ui/button';
-import { Building, ChevronDown, LogOut, StoreIcon } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { Building, ChevronDown, LogOut } from 'lucide-react';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { getProfile } from '@/api/get-profile';
 import { getManagedRestaurant } from '@/api/get-managed-restaurant';
 import { Skeleton } from './ui/skeleton';
 import { Dialog, DialogTrigger } from './ui/dialog';
 import { StoreProfileDialog } from './store-profile-dialog';
+import { signOut } from '@/api/sign-out';
 
 export function AccountMenu() {
+    const navigate = useNavigate();
+
     const { data: profile, isLoading: isLoadingProfile } = useQuery({
         queryKey: ['profile'],
         queryFn: getProfile,
@@ -28,6 +32,14 @@ export function AccountMenu() {
             queryFn: getManagedRestaurant,
             staleTime: Infinity //-- not to refetch when the window loads
         });
+    // -- Specifying replace: true will cause the navigation to replace the current entry in the history stack instead of adding a new one.
+    // -- will not allow the user to go back to the previous page using the browser's back button.
+    const { mutateAsync: signOutFn, isPending: isSigningOut } = useMutation({
+        mutationFn: signOut,
+        onSuccess: () => {
+            navigate('/sign-in', { replace: true });
+        }
+    });
 
     return (
         <Dialog>
@@ -69,9 +81,15 @@ export function AccountMenu() {
                             <span>Perfil da loja</span>
                         </DropdownMenuItem>
                     </DialogTrigger>
-                    <DropdownMenuItem className="text-rose-500 dark:text-rose-400">
-                        <LogOut className="mr-3 size-4" />
-                        <span>Sair</span>
+                    <DropdownMenuItem
+                        asChild
+                        className="text-rose-500 dark:text-rose-400"
+                        disabled={isSigningOut}
+                    >
+                        <button onClick={() => signOutFn()} className="w-full">
+                            <LogOut className="mr-3 size-4" />
+                            <span>Sair</span>
+                        </button>
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
