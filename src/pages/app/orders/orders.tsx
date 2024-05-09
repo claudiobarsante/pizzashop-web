@@ -17,15 +17,26 @@ import { z } from 'zod';
 export function Orders() {
     // -- instead of using a state to store the page index, use the url search params
     const [searchParams, setSearchParams] = useSearchParams();
+
+    const orderId = searchParams.get('orderId');
+    const customerName = searchParams.get('customerName');
+    const status = searchParams.get('status');
+
     // -- pageIndex will always be page that is in the url search params less 1
     const pageIndex = z.coerce
         .number()
         .transform((page) => page - 1)
         .parse(searchParams.get('page') ?? '1');
-
+    // -- for the bakcend to filter all orders, we need to pass null for the status
     const { data: result } = useQuery({
-        queryKey: ['orders', pageIndex],
-        queryFn: () => getOrders({ pageIndex })
+        queryKey: ['orders', pageIndex, orderId, customerName, status],
+        queryFn: () =>
+            getOrders({
+                pageIndex,
+                orderId,
+                customerName,
+                status: status === 'all' ? null : status
+            })
     });
 
     function handlePagination(pageIndex: number) {
