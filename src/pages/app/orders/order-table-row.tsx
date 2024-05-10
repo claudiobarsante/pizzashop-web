@@ -7,16 +7,12 @@ import { OrderDetails } from './order-details';
 import { OrderStatus } from '@/components/order-status';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { OrderStatusType } from '@/api/get-orders';
 interface OrderTableRowProps {
     order: {
         orderId: string;
         createdAt: string;
-        status:
-            | 'pending'
-            | 'canceled'
-            | 'processing'
-            | 'delivering'
-            | 'delivered';
+        status: OrderStatusType;
         customerName: string;
         total: number;
     };
