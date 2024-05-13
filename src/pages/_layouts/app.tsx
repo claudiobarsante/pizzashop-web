@@ -18,7 +18,7 @@ export function AppLayout() {
                     const code = error.response?.data.code;
 
                     if (status === 401 && code === 'UNAUTHORIZED') {
-                        navigate('/sign-in', { replace: true }); // -- disable
+                        navigate('/sign-in', { replace: true }); // -- disable back to page using browser's back button
                     }
                 }
             }
