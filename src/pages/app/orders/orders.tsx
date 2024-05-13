@@ -14,6 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getOrders } from '@/api/get-orders';
 import { useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
+import { OrderTableSkeleton } from './order-table-skeleton';
 export function Orders() {
     // -- instead of using a state to store the page index, use the url search params
     const [searchParams, setSearchParams] = useSearchParams();
@@ -28,7 +29,7 @@ export function Orders() {
         .transform((page) => page - 1)
         .parse(searchParams.get('page') ?? '1');
     // -- for the bakcend to filter all orders, we need to pass null for the status
-    const { data: result } = useQuery({
+    const { data: result, isLoading: isLoadingOrders } = useQuery({
         queryKey: ['orders', pageIndex, orderId, customerName, status],
         queryFn: () =>
             getOrders({
@@ -75,6 +76,7 @@ export function Orders() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
+                                {isLoadingOrders && <OrderTableSkeleton />}
                                 {result &&
                                     result.orders.map((order) => {
                                         return (
